@@ -7,45 +7,26 @@ var proxy = require('express-http-proxy'),
 
 // Token validation from keystone-middlewares
 clientAPI.use('/v2.0/tokens/:token', proxy(config.keystone.host + ':' + config.keystone.client_port, {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  },
   decorateRequest: Token.validate
 }));
 
 adminAPI.use('/v2.0/tokens/:token', proxy(config.keystone.host + ':' + config.keystone.admin_port, {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  },
   decorateRequest: Token.validate
 }));
 
 // Token creation
 clientAPI.use('/v2.0/tokens', proxy(config.keystone.host + ':' + config.keystone.client_port, {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  },
-  decorateRequest: Token.create
+  decorateRequest: Token.create,
+  intercept: Token.create_response
 }));
 
 adminAPI.use('/v2.0/tokens', proxy(config.keystone.host + ':' + config.keystone.admin_port, {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  },
   decorateRequest: Token.create
 }));
 
-clientAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.client_port, {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  }
-}));
+clientAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.client_port));
 
-adminAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.admin_port, {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  }
-}));
+adminAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.admin_port));
 
 // Initialize the admin server
 adminAPI.listen(config.bridge.admin_port);

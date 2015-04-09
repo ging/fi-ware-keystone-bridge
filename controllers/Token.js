@@ -5,18 +5,114 @@ var Token = (function() {
     // Token creation from username/password
     var create = function(req) {
 
+        var auth = JSON.parse(req.bodyContent.toString('utf-8')).auth;
+
+        console.log('[V2] Create token for user', auth.passwordCredentials.username);
+
+        var new_auth = {
+            "auth": {
+                "identity": {
+                    "methods": [
+                        "password"
+                    ],
+                    "password": {
+                        "user": {
+                            "domain": {
+                                "id": "default"
+                            },
+                            "name": auth.passwordCredentials.username,
+                            "password": auth.passwordCredentials.password
+                        }
+                    }
+                },
+                "scope": {
+                    "project": {
+                        "domain": {
+                            "id": "default"
+                        },
+                        "name": auth.tenantName
+                    }
+                }
+            }
+        };
+
+        req.bodyContent = JSON.stringify(new_auth);
+        req.path = '/v3/auth/tokens';
         return req;
     };
 
     // Token validation
     var validate = function(req) {
+
+        console.log('[V2] VALIDATE TOKEN');
         
         return req;
     };
 
+    var create_response = function(rsp, data, req, res, callback) {
+
+        var token = JSON.parse(data.toString('utf8')).token;
+
+        var json = {
+            "access": {
+                "token": {
+                    "issued_at": token.issued_at,
+                    "expires": token.expires_at,
+                    "id": rsp.headers['x-subject-token'],
+                    "tenant": {
+                        "description": null,
+                        "enabled": true,
+                        "id": token.project.id,
+                        "name": token.project.name
+                    }
+                },
+                "serviceCatalog": convert_catalog(token.catalog)
+            }
+        };
+
+        console.log('new body', JSON.stringify(json));
+
+        callback(null, JSON.stringify(json));
+    };
+
+    var convert_catalog = function (catalog) {
+        var new_catalog = [];
+    
+        for (var ser in catalog) {
+            var new_ser = {};
+            new_ser.type = catalog[ser].type;
+            new_ser.id = catalog[ser].id;
+            new_ser.name = catalog[ser].name;
+            new_ser.endpoints = [];
+
+            for (var end in catalog[ser].endpoints) {
+                var reg = catalog[ser].endpoints[end].region;
+                var new_end;
+                for (var e in new_ser.endpoints) {
+                    if (new_ser.endpoints[e].region === reg) {
+                        new_end = new_ser.endpoints[e];
+                        break;
+                    }
+                }
+
+                if (!new_end) {
+                    new_end = {region: reg};
+                    new_ser.endpoints.push(new_end);
+                    console.log('no existe aun', new_ser.endpoints);
+                }
+                var type = catalog[ser].endpoints[end].interface + 'URL';
+                new_end[type] = catalog[ser].endpoints[end].url;
+            
+            }
+            new_catalog.push(new_ser);
+        }
+        return new_catalog
+    };
+
     return {
         create: create,
-        validate: validate
+        validate: validate,
+        create_response: create_response
     }
 })();
 
