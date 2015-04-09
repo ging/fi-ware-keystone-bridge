@@ -1,0 +1,12 @@
+var config = {};
+
+config.bridge = {};
+config.bridge.admin_port = 4731;
+config.bridge.client_port = 4730;
+
+config.keystone = {};
+config.keystone.host = 'localhost';
+config.keystone.admin_port = 35357;
+config.keystone.client_port = 5000;
+
+module.exports = config;

@@ -1,0 +1,9 @@
+{
+  "name": "fi-ware-keystone-proxy",
+  "description": "",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "4.x",
+    "express-http-proxy": "0.4.0"
+  }
+}
