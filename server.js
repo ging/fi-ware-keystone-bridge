@@ -29,10 +29,12 @@ adminAPI.use('/v2.0/tokens', proxy(config.keystone.host + ':' + config.keystone.
 
 clientAPI.use('/', function (req, res, next) {
     console.log('[V3 Client]', req.path);
+    next();
 }, proxy(config.keystone.host + ':' + config.keystone.client_port));
 
 adminAPI.use('/', function (req, res, next) {
     console.log('[V3 Admin]', req.path);
+    next();
 }, proxy(config.keystone.host + ':' + config.keystone.admin_port));
 
 // Initialize the admin server
