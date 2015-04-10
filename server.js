@@ -27,9 +27,13 @@ adminAPI.use('/v2.0/tokens', proxy(config.keystone.host + ':' + config.keystone.
   intercept: Token.create_token_response
 }));
 
-clientAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.client_port));
+clientAPI.use('/', function (req, res, next) {
+    console.log('[V3 Client]', req.path);
+}, proxy(config.keystone.host + ':' + config.keystone.client_port));
 
-adminAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.admin_port));
+adminAPI.use('/', function (req, res, next) {
+    console.log('[V3 Admin]', req.path);
+}, proxy(config.keystone.host + ':' + config.keystone.admin_port));
 
 // Initialize the admin server
 adminAPI.listen(config.bridge.admin_port);
