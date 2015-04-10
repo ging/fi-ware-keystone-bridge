@@ -7,21 +7,24 @@ var proxy = require('express-http-proxy'),
 
 // Token validation from keystone-middlewares
 clientAPI.use('/v2.0/tokens/:token', proxy(config.keystone.host + ':' + config.keystone.client_port, {
-  decorateRequest: Token.validate
+  decorateRequest: Token.validate,
+  intercept: Token.create_validate_response
 }));
 
 adminAPI.use('/v2.0/tokens/:token', proxy(config.keystone.host + ':' + config.keystone.admin_port, {
-  decorateRequest: Token.validate
+  decorateRequest: Token.validate,
+  intercept: Token.create_validate_response
 }));
 
 // Token creation
 clientAPI.use('/v2.0/tokens', proxy(config.keystone.host + ':' + config.keystone.client_port, {
   decorateRequest: Token.create,
-  intercept: Token.create_response
+  intercept: Token.create_token_response
 }));
 
 adminAPI.use('/v2.0/tokens', proxy(config.keystone.host + ':' + config.keystone.admin_port, {
-  decorateRequest: Token.create
+  decorateRequest: Token.create,
+  intercept: Token.create_token_response
 }));
 
 clientAPI.use('/', proxy(config.keystone.host + ':' + config.keystone.client_port));

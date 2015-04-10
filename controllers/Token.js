@@ -44,12 +44,15 @@ var Token = (function() {
     // Token validation
     var validate = function(req) {
 
-        console.log('[V2] VALIDATE TOKEN');
-        
+        console.log('[V2] Validate token', req.params.token, 'from user', req.headers['x-auth-token']);
+
+        req.path = '/v3/auth/tokens';
+        req.headers['x-subject-token'] = req.params.token;
+
         return req;
     };
 
-    var create_response = function(rsp, data, req, res, callback) {
+    var create_token_response = function(rsp, data, req, res, callback) {
 
         var token = JSON.parse(data.toString('utf8')).token;
 
@@ -70,7 +73,32 @@ var Token = (function() {
             }
         };
 
-        console.log('new body', JSON.stringify(json));
+        callback(null, JSON.stringify(json));
+    };
+
+    var create_validate_response = function(rsp, data, req, res, callback) {
+
+        var token = JSON.parse(data.toString('utf8')).token;
+
+        var json = {
+            "access":{
+                "token":{
+                    "expires": token.expires_at,
+                    "id": rsp.headers['x-subject-token'],
+                    "tenant":{
+                        "id": token.project.id,
+                        "name": token.project.name
+                    }
+                },
+                "user":{
+                    "name": token.user.name,
+                    "tenantName": token.project.name,
+                    "id": token.user.name,
+                    "roles": token.roles,
+                    "tenantId": token.project.id
+                }
+            }
+        }
 
         callback(null, JSON.stringify(json));
     };
@@ -98,7 +126,6 @@ var Token = (function() {
                 if (!new_end) {
                     new_end = {region: reg};
                     new_ser.endpoints.push(new_end);
-                    console.log('no existe aun', new_ser.endpoints);
                 }
                 var type = catalog[ser].endpoints[end].interface + 'URL';
                 new_end[type] = catalog[ser].endpoints[end].url;
@@ -112,7 +139,8 @@ var Token = (function() {
     return {
         create: create,
         validate: validate,
-        create_response: create_response
+        create_token_response: create_token_response,
+        create_validate_response: create_validate_response
     }
 })();
 
