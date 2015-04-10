@@ -30,7 +30,8 @@ var Token = (function() {
                         "domain": {
                             "id": "default"
                         },
-                        "name": auth.tenantName
+                        "name": auth.tenantName,
+                        "id": auth.tenantId
                     }
                 }
             }
@@ -87,7 +88,7 @@ var Token = (function() {
         var token = JSON.parse(data.toString('utf8')).token;
 
         if (token) {
-            
+
             var json = {
                 "access":{
                     "token":{
