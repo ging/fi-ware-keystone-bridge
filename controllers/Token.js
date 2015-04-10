@@ -56,51 +56,63 @@ var Token = (function() {
 
         var token = JSON.parse(data.toString('utf8')).token;
 
-        var json = {
-            "access": {
-                "token": {
-                    "issued_at": token.issued_at,
-                    "expires": token.expires_at,
-                    "id": rsp.headers['x-subject-token'],
-                    "tenant": {
-                        "description": null,
-                        "enabled": true,
-                        "id": token.project.id,
-                        "name": token.project.name
-                    }
-                },
-                "serviceCatalog": convert_catalog(token.catalog)
-            }
-        };
+        if (token) {
 
-        callback(null, JSON.stringify(json));
+            var json = {
+                "access": {
+                    "token": {
+                        "issued_at": token.issued_at,
+                        "expires": token.expires_at,
+                        "id": rsp.headers['x-subject-token'],
+                        "tenant": {
+                            "description": null,
+                            "enabled": true,
+                            "id": token.project.id,
+                            "name": token.project.name
+                        }
+                    },
+                    "serviceCatalog": convert_catalog(token.catalog)
+                }
+            };
+
+            callback(null, JSON.stringify(json));
+        } else {
+            callback(null, data);
+        }
+
     };
 
     var create_validate_response = function(rsp, data, req, res, callback) {
 
         var token = JSON.parse(data.toString('utf8')).token;
 
-        var json = {
-            "access":{
-                "token":{
-                    "expires": token.expires_at,
-                    "id": rsp.headers['x-subject-token'],
-                    "tenant":{
-                        "id": token.project.id,
-                        "name": token.project.name
+        if (token) {
+            
+            var json = {
+                "access":{
+                    "token":{
+                        "expires": token.expires_at,
+                        "id": rsp.headers['x-subject-token'],
+                        "tenant":{
+                            "id": token.project.id,
+                            "name": token.project.name
+                        }
+                    },
+                    "user":{
+                        "name": token.user.name,
+                        "tenantName": token.project.name,
+                        "id": token.user.name,
+                        "roles": token.roles,
+                        "tenantId": token.project.id
                     }
-                },
-                "user":{
-                    "name": token.user.name,
-                    "tenantName": token.project.name,
-                    "id": token.user.name,
-                    "roles": token.roles,
-                    "tenantId": token.project.id
                 }
             }
-        }
 
-        callback(null, JSON.stringify(json));
+            callback(null, JSON.stringify(json));
+
+        } else {
+            callback(null, data);
+        }
     };
 
     var convert_catalog = function (catalog) {
