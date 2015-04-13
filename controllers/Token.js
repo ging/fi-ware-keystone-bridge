@@ -55,31 +55,38 @@ var Token = (function() {
 
     var create_token_response = function(rsp, data, req, res, callback) {
 
-        var token = JSON.parse(data.toString('utf8')).token;
+        try {
 
-        if (token) {
+            var token = JSON.parse(data.toString('utf8')).token;
 
-            var json = {
-                "access": {
-                    "token": {
-                        "issued_at": token.issued_at,
-                        "expires": token.expires_at,
-                        "id": rsp.headers['x-subject-token'],
-                        "tenant": {
-                            "description": null,
-                            "enabled": true,
-                            "id": token.project.id,
-                            "name": token.project.name
-                        }
-                    },
-                    "serviceCatalog": convert_catalog(token.catalog)
-                }
-            };
+            if (token) {
 
-            callback(null, JSON.stringify(json));
-        } else {
+                var json = {
+                    "access": {
+                        "token": {
+                            "issued_at": token.issued_at,
+                            "expires": token.expires_at,
+                            "id": rsp.headers['x-subject-token'],
+                            "tenant": {
+                                "description": null,
+                                "enabled": true,
+                                "id": token.project.id,
+                                "name": token.project.name
+                            }
+                        },
+                        "serviceCatalog": convert_catalog(token.catalog)
+                    }
+                };
+
+                callback(null, JSON.stringify(json));
+            } else {
+                callback(null, data);
+            }
+
+        } catch(err) {
             callback(null, data);
         }
+
 
     };
 
