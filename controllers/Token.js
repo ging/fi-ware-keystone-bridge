@@ -74,9 +74,18 @@ var Token = (function() {
                                 "name": token.project.name
                             }
                         },
-                        "serviceCatalog": convert_catalog(token.catalog)
+                        "serviceCatalog": convert_catalog(token.catalog),
+                        "user":{
+                            "name": token.user.name,
+                            "tenantName": token.project.name,
+                            "id": token.user.name,
+                            "roles": token.roles,
+                            "tenantId": token.project.id
+                        }
                     }
                 };
+
+                console.log('resp create ', JSON.stringify(json));
 
                 callback(null, JSON.stringify(json));
             } else {
