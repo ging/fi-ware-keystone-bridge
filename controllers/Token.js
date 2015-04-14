@@ -36,7 +36,7 @@ var Token = (function() {
                 }
             }
         };
-
+        console.log('req', JSON.stringify(new_auth));
         req.bodyContent = JSON.stringify(new_auth);
         req.path = '/v3/auth/tokens';
         return req;
