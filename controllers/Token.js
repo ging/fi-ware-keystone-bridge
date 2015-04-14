@@ -140,7 +140,7 @@ var Token = (function() {
 
             for (var end in catalog[ser].endpoints) {
                 var reg = catalog[ser].endpoints[end].region;
-                var new_end;
+                var new_end = false;
                 for (var e in new_ser.endpoints) {
                     if (new_ser.endpoints[e].region === reg) {
                         new_end = new_ser.endpoints[e];
