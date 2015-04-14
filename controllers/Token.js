@@ -7,6 +7,10 @@ var Token = (function() {
 
         var auth = JSON.parse(req.bodyContent.toString('utf-8')).auth;
 
+        if (!auth.passwordCredentials.username) {
+            return req;
+        }
+
         console.log('[V2] Create token for user', auth.passwordCredentials.username);
 
         var new_auth = {
