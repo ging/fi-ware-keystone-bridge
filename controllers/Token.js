@@ -76,6 +76,7 @@ var Token = (function() {
                         },
                         "serviceCatalog": convert_catalog(token.catalog),
                         "user":{
+                            "username": token.user.name,
                             "name": token.user.name,
                             "tenantName": token.project.name,
                             "id": token.user.name,
