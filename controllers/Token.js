@@ -92,33 +92,38 @@ var Token = (function() {
 
     var create_validate_response = function(rsp, data, req, res, callback) {
 
-        var token = JSON.parse(data.toString('utf8')).token;
+        try {
 
-        if (token) {
+            var token = JSON.parse(data.toString('utf8')).token;
 
-            var json = {
-                "access":{
-                    "token":{
-                        "expires": token.expires_at,
-                        "id": rsp.headers['x-subject-token'],
-                        "tenant":{
-                            "id": token.project.id,
-                            "name": token.project.name
+            if (token) {
+
+                var json = {
+                    "access":{
+                        "token":{
+                            "expires": token.expires_at,
+                            "id": rsp.headers['x-subject-token'],
+                            "tenant":{
+                                "id": token.project.id,
+                                "name": token.project.name
+                            }
+                        },
+                        "user":{
+                            "name": token.user.name,
+                            "tenantName": token.project.name,
+                            "id": token.user.name,
+                            "roles": token.roles,
+                            "tenantId": token.project.id
                         }
-                    },
-                    "user":{
-                        "name": token.user.name,
-                        "tenantName": token.project.name,
-                        "id": token.user.name,
-                        "roles": token.roles,
-                        "tenantId": token.project.id
                     }
                 }
+
+                callback(null, JSON.stringify(json));
+
+            } else {
+                callback(null, data);
             }
-
-            callback(null, JSON.stringify(json));
-
-        } else {
+        } catch(err) {
             callback(null, data);
         }
     };
