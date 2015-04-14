@@ -90,7 +90,6 @@ var Token = (function() {
                     }
                 };
 
-                console.log('resp create ', JSON.stringify(json));
 
                 callback(null, JSON.stringify(json));
             } else {
